@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MarketMVP | Painel do vendedor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { display: ["Space Grotesk", "sans-serif"], body: ["Plus Jakarta Sans", "sans-serif"] },
+            colors: {
+              brand: { 50: "#F8F7F2", 100: "#EDE8D8", 200: "#D9CEAA", 300: "#C7B57D", 400: "#B99B56", 500: "#A8853A", 600: "#886B2F", 700: "#665024", 800: "#43361A", 900: "#251E10" },
+              accent: { 500: "#0A7D7A", 600: "#075F5D" },
+              coral: { 500: "#E66A4E", 600: "#C85339" },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .grid-bg {
+        background-image: radial-gradient(#d9ceaa 0.8px, transparent 0.8px), radial-gradient(#d9ceaa 0.8px, #f8f7f2 0.8px);
+        background-size: 28px 28px;
+        background-position: 0 0, 14px 14px;
+      }
+    </style>
+  </head>
+  <body class="font-body bg-brand-50 text-brand-900">
+    <div class="min-h-screen grid-bg">
+      <header class="border-b border-brand-200/80 bg-white/75 backdrop-blur">
+        <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+          <a href="index.html" class="font-display text-xl font-bold">MarketMVP</a>
+          <nav class="flex gap-5 text-sm font-medium">
+            <a href="profile-seller.html" class="hover:text-accent-600">Perfil da loja</a>
+            <a href="categories.html" class="hover:text-accent-600">Ver loja</a>
+            <a href="#" onclick="logout(); return false;" class="hover:text-accent-600">Sair</a>
+          </nav>
+        </div>
+      </header>
+
+      <main class="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+        <section class="rounded-3xl border border-brand-200 bg-white p-6 shadow-sm">
+          <h1 class="font-display text-3xl font-bold">Painel do vendedor</h1>
+          <p class="mt-1 text-sm text-brand-700">Cadastre novos produtos com múltiplas fotos e acompanhe seu catálogo.</p>
+        </section>
+
+        <section class="rounded-3xl border border-brand-200 bg-white p-6 shadow-sm">
+          <h2 class="font-display text-2xl font-bold">Novo anúncio</h2>
+          <form id="product-form" enctype="multipart/form-data" class="mt-4 grid gap-4 sm:grid-cols-2">
+            <label class="sm:col-span-2"><span class="mb-1 block text-sm font-medium">Nome</span><input name="name" required class="w-full rounded-xl border border-brand-300 px-4 py-2.5" /></label>
+            <label class="sm:col-span-2"><span class="mb-1 block text-sm font-medium">Descrição</span><textarea name="description" required class="w-full rounded-xl border border-brand-300 px-4 py-2.5"></textarea></label>
+            <label class="sm:col-span-1"><span class="mb-1 block text-sm font-medium">Categoria</span><input name="category" required class="w-full rounded-xl border border-brand-300 px-4 py-2.5" /></label>
+            <label class="sm:col-span-1"><span class="mb-1 block text-sm font-medium">Preço (R$)</span><input name="price" type="number" step="0.01" min="0" required class="w-full rounded-xl border border-brand-300 px-4 py-2.5" /></label>
+            <label class="sm:col-span-1"><span class="mb-1 block text-sm font-medium">Estoque</span><input name="stock" type="number" min="0" value="0" class="w-full rounded-xl border border-brand-300 px-4 py-2.5" /></label>
+            <label class="sm:col-span-1"><span class="mb-1 block text-sm font-medium">Fotos (até 8; a 1ª será a principal)</span><input name="images" type="file" accept="image/*" multiple class="text-sm" /></label>
+            <p id="form-msg" class="hidden sm:col-span-2 text-sm font-medium"></p>
+            <button type="submit" class="sm:col-span-2 rounded-xl bg-brand-900 px-4 py-2.5 font-semibold text-brand-50">Cadastrar produto</button>
+          </form>
+        </section>
+
+        <section class="rounded-3xl border border-brand-200 bg-white p-6 shadow-sm">
+          <h2 class="font-display text-2xl font-bold">Meus produtos</h2>
+          <div class="mt-4 overflow-x-auto rounded-2xl border border-brand-200">
+            <table class="min-w-full text-left text-sm">
+              <thead class="bg-brand-100 text-brand-800">
+                <tr>
+                  <th class="px-4 py-3 font-semibold">Foto</th>
+                  <th class="px-4 py-3 font-semibold">Item</th>
+                  <th class="px-4 py-3 font-semibold">Categoria</th>
+                  <th class="px-4 py-3 font-semibold">Estoque</th>
+                  <th class="px-4 py-3 font-semibold">Preço</th>
+                  <th class="px-4 py-3 font-semibold">Ações</th>
+                </tr>
+              </thead>
+              <tbody id="products-tbody" class="divide-y divide-brand-200 bg-white"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="api.js"></script>
+    <script>
+      const session = requireAuth(["seller"]);
+      const formMsg = document.getElementById("form-msg");
+
+      async function loadProducts() {
+        const all = await apiFetch("/products");
+        const mine = all.filter((p) => p.seller.id === session.user.id);
+        const tbody = document.getElementById("products-tbody");
+        tbody.innerHTML = "";
+        if (mine.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-4 text-sm text-brand-700">Nenhum produto cadastrado ainda.</td></tr>';
+          return;
+        }
+        mine.forEach((p) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="px-4 py-3">${p.primaryImage ? `<img src="${p.primaryImage}" class="h-12 w-12 rounded-lg object-cover" />` : "-"}</td>
+            <td class="px-4 py-3"><a href="product-details.html?id=${p.id}" class="font-semibold text-accent-600 hover:underline">${p.name}</a></td>
+            <td class="px-4 py-3">${p.category}</td>
+            <td class="px-4 py-3">${p.stock}</td>
+            <td class="px-4 py-3">R$ ${p.price.toFixed(2)}</td>
+            <td class="px-4 py-3"><button data-delete="${p.id}" class="rounded-lg border border-brand-300 px-3 py-1.5 font-semibold hover:bg-brand-100">Excluir</button></td>
+          `;
+          tr.querySelector("[data-delete]").addEventListener("click", async () => {
+            if (!confirm(`Excluir "${p.name}"?`)) return;
+            try {
+              await apiFetch(`/products/${p.id}`, { method: "DELETE" });
+              await loadProducts();
+            } catch (error) {
+              alert(error.message);
+            }
+          });
+          tbody.appendChild(tr);
+        });
+      }
+
+      document.getElementById("product-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        try {
+          const response = await fetch("/products", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${session.token}` },
+            body: formData,
+          });
+          const body = await response.json();
+          if (!response.ok) throw new Error(body.message || "Erro ao cadastrar produto.");
+          showFormMessage(formMsg, "Produto cadastrado.", false);
+          event.target.reset();
+          await loadProducts();
+        } catch (error) {
+          showFormMessage(formMsg, error.message, true);
+        }
+      });
+
+      if (session) loadProducts().catch((error) => alert(error.message));
+    </script>
+  </body>
+</html>
