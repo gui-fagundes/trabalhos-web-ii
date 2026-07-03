@@ -1,0 +1,15 @@
+import type { Transaction } from "../../domain/entities/Transaction.js";
+import type { TransactionFilters, TransactionRepository } from "../../domain/repositories/TransactionRepository.js";
+
+export type ListTransactionsInput = {
+  userId: string;
+  filters?: TransactionFilters;
+};
+
+export class ListTransactionsUseCase {
+  constructor(private readonly transactionRepository: TransactionRepository) {}
+
+  public async execute(input: ListTransactionsInput): Promise<Transaction[]> {
+    return this.transactionRepository.listByUserId(input.userId, input.filters);
+  }
+}
