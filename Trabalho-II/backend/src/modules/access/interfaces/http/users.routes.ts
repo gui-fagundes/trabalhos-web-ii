@@ -89,6 +89,8 @@ router.post("/", ensureAuthenticated, async (req: Request, res: Response) => {
       passwordHash: hashPassword(parsed.data.password),
       role: parsed.data.role ?? "buyer",
       permissions,
+      // Usuário criado pelo admin já nasce com e-mail verificado.
+      emailVerifiedAt: new Date(),
     });
 
     return res.status(201).json({

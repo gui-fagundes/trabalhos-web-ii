@@ -69,3 +69,45 @@ function showFormMessage(el, message, isError) {
   el.classList.toggle("text-red-600", !!isError);
   el.classList.toggle("text-accent-600", !isError);
 }
+
+/**
+ * Popula o menu principal e a área de ações de acordo com a sessão salva.
+ * Espera dois containers: `[data-nav-links]` (menu) e `[data-nav-actions]` (login/logout).
+ */
+function renderHeader() {
+  const nav = document.querySelector("[data-nav-links]");
+  const actions = document.querySelector("[data-nav-actions]");
+  if (!nav || !actions) return;
+
+  const session = getSession();
+  const links = [];
+  links.push('<a href="index.html" class="hover:text-accent-600">Início</a>');
+
+  if (!session) {
+    nav.innerHTML = links.join("");
+    actions.innerHTML = `
+      <a href="login.html" class="rounded-full border border-brand-300 px-4 py-2 text-sm font-semibold hover:bg-brand-100">Entrar</a>
+      <a href="signup.html" class="rounded-full bg-brand-900 px-4 py-2 text-sm font-semibold text-brand-50 hover:bg-brand-800">Criar conta</a>
+    `;
+    return;
+  }
+
+  const role = session.user.role;
+  if (role === "admin") {
+    links.push('<a href="admin-dashboard.html" class="hover:text-accent-600">Painel admin</a>');
+  }
+  if (role === "seller") {
+    links.push('<a href="seller-dashboard.html" class="hover:text-accent-600">Painel do vendedor</a>');
+  }
+  if (role === "buyer") {
+    links.push('<a href="index.html" class="hover:text-accent-600">Explorar</a>');
+  }
+
+  nav.innerHTML = links.join("");
+  actions.innerHTML = `
+    <span class="hidden text-sm text-brand-700 sm:inline">Olá, <strong>${session.user.name}</strong></span>
+    <button type="button" onclick="logout()" class="rounded-full border border-brand-300 px-4 py-2 text-sm font-semibold hover:bg-brand-100">Sair</button>
+  `;
+}
+
+document.addEventListener("DOMContentLoaded", renderHeader);

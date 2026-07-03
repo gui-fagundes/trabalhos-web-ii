@@ -37,6 +37,7 @@ export class PrismaUserRepository implements UserRepository {
         cpf: input.cpf,
         password: input.passwordHash,
         role: input.role ?? "buyer",
+        emailVerifiedAt: input.emailVerifiedAt ?? null,
         permissions: {
           create: (input.permissions ?? []).map((module) => ({ module })),
         },

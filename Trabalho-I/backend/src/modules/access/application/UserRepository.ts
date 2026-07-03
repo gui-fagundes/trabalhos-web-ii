@@ -7,6 +7,7 @@ export type CreateUserInput = {
   passwordHash: string;
   role?: Role;
   permissions?: ModuleAccess[];
+  emailVerifiedAt?: Date | null;
 };
 
 export type UserCredentials = {
